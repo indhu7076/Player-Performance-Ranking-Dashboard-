@@ -222,3 +222,4 @@ player-performance-dashboard/
 
 ### Q15: How can this project be scaled in the future?
 **Answer**: By implementing SQL database storage (PostgreSQL), adding Machine Learning models (Scikit-Learn) for predictive performance analytics, and ingesting live sports telemetry APIs.
+# Player-Performance-Ranking-Dashboard-
