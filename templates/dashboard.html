@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="dashboard-page">
+
+  <!-- Header & Filters Bar -->
+  <div class="card" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="font-weight: 700; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
+        <i data-lucide="filter"></i> Dashboard Filters
+      </div>
+      
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+        <div>
+          <label for="dash-team-filter" class="form-label" style="margin: 0; display: inline-block; margin-right: 0.4rem;">Team:</label>
+          <select id="dash-team-filter" class="form-control" style="width: 160px; display: inline-block;">
+            <option value="all">All Teams</option>
+            <option value="Apex Strikers">Apex Strikers</option>
+            <option value="Nova Knights">Nova Knights</option>
+            <option value="Titan Warriors">Titan Warriors</option>
+            <option value="Shadow Strikers">Shadow Strikers</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="dash-pos-filter" class="form-label" style="margin: 0; display: inline-block; margin-right: 0.4rem;">Position:</label>
+          <select id="dash-pos-filter" class="form-control" style="width: 160px; display: inline-block;">
+            <option value="all">All Positions</option>
+            <option value="Forward">Forward</option>
+            <option value="Midfielder">Midfielder</option>
+            <option value="Defender">Defender</option>
+            <option value="Goalkeeper">Goalkeeper</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="dash-range-filter" class="form-label" style="margin: 0; display: inline-block; margin-right: 0.4rem;">Level:</label>
+          <select id="dash-range-filter" class="form-control" style="width: 160px; display: inline-block;">
+            <option value="all">All Levels</option>
+            <option value="Excellent">Excellent (≥85)</option>
+            <option value="Very Good">Very Good (75-84.9)</option>
+            <option value="Good">Good (65-74.9)</option>
+            <option value="Average">Average (<65)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 4 KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-header"><span class="kpi-label">Total Players</span></div>
+      <div class="kpi-value" id="kpi-total-players">—</div>
+      <div class="kpi-subtext">Active dataset players</div>
+    </div>
+
+    <div class="kpi-card green">
+      <div class="kpi-header"><span class="kpi-label">Average Score</span></div>
+      <div class="kpi-value" id="kpi-avg-score">—</div>
+      <div class="kpi-subtext">Mean performance score</div>
+    </div>
+
+    <div class="kpi-card gold">
+      <div class="kpi-header"><span class="kpi-label">Highest Score</span></div>
+      <div class="kpi-value" id="kpi-highest-score">—</div>
+      <div class="kpi-subtext">Peak performance score</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Top Player</span></div>
+      <div class="kpi-value" id="kpi-top-player" style="font-size: 1.25rem;">—</div>
+      <div class="kpi-subtext">Rank #1 Leader</div>
+    </div>
+  </div>
+
+  <!-- 4 Clean Chart.js Charts -->
+  <div class="charts-grid">
+    <!-- Chart 1: Performance Score Distribution -->
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="pie-chart"></i> 1. Performance Score Distribution</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-distribution"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Team-wise Performance -->
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="bar-chart-2"></i> 2. Team-wise Performance</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-team"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 3: Position-wise Performance -->
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="users"></i> 3. Position-wise Performance</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-position"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 4: Performance Trend -->
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="line-chart"></i> 4. Performance Score Trend</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-trend"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

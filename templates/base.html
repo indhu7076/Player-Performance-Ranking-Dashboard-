@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLAYER PERFORMANCE RANKING DASHBOARD | Sports Analytics</title>
+  <meta name="description" content="Sports Analytics Web Application for evaluating player statistics, calculating performance scores, dynamic rankings, and data insights.">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  
+  <!-- Icon & Chart CDN Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- WebGL 3D Background Canvas -->
+  <canvas id="bg3d-canvas"></canvas>
+
+  <div class="app-container">
+    
+    <!-- Top Sticky Navbar Header -->
+    <header class="top-navbar sticky-navbar">
+      <div class="navbar-brand">
+        <a href="/" class="brand-link">
+          <span class="brand-icon">🏆</span>
+          <span class="brand-title">PLAYER PERFORMANCE RANKING DASHBOARD</span>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="desktop-nav">
+        <a href="/" class="nav-item {% if active_page == 'home' %}active{% endif %}">Home</a>
+        <a href="/dashboard" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="/rankings" class="nav-item {% if active_page == 'rankings' %}active{% endif %}">Rankings</a>
+        <a href="/comparison" class="nav-item {% if active_page == 'comparison' %}active{% endif %}">Compare</a>
+        <a href="/analytics" class="nav-item {% if active_page == 'analytics' %}active{% endif %}">Analytics</a>
+        
+        <!-- More Dropdown -->
+        <div class="nav-dropdown">
+          <button class="nav-item dropdown-btn">
+            More <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/algorithm" class="dropdown-item {% if active_page == 'algorithm' %}active{% endif %}">Ranking Algorithm</a>
+            <a href="/data_management" class="dropdown-item {% if active_page == 'data_management' %}active{% endif %}">Data Management</a>
+            <a href="/player/PL001" class="dropdown-item {% if active_page == 'player_profile' %}active{% endif %}">Player Profile</a>
+            <a href="/about" class="dropdown-item {% if active_page == 'about' %}active{% endif %}">About</a>
+            <a href="/settings" class="dropdown-item {% if active_page == 'settings' %}active{% endif %}">Settings</a>
+          </div>
+        </div>
+      </nav>
+
+      <div class="navbar-actions">
+        {% if current_user %}
+          <span class="badge badge-very-good" style="padding: 0.4rem 0.8rem; font-size: 0.82rem;">
+            👤 {{ current_user.role }} ({{ current_user.username }})
+          </span>
+          <a href="/logout" class="btn btn-outline btn-sm" title="Log Out Session">
+            <i data-lucide="log-out"></i> Logout
+          </a>
+        {% else %}
+          <a href="/login" class="btn btn-primary btn-sm">
+            <i data-lucide="log-in"></i> Login
+          </a>
+          <a href="/register" class="btn btn-outline btn-sm">
+            Register
+          </a>
+        {% endif %}
+
+        <button class="btn btn-outline btn-sm" id="btn-presentation-mode" title="Toggle Presentation Mode">
+          <i data-lucide="presentation"></i>
+        </button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Slide-out Menu -->
+    <div class="mobile-drawer" id="mobile-drawer">
+      <div class="drawer-header">
+        <span>PLAYER PERFORMANCE RANKING DASHBOARD</span>
+        <button class="btn btn-outline btn-sm" id="mobile-menu-close"><i data-lucide="x"></i></button>
+      </div>
+      <nav class="mobile-nav">
+        <a href="/" class="mobile-item">Home</a>
+        <a href="/dashboard" class="mobile-item">Dashboard</a>
+        <a href="/rankings" class="mobile-item">Rankings</a>
+        <a href="/comparison" class="mobile-item">Compare</a>
+        <a href="/analytics" class="mobile-item">Analytics</a>
+        <a href="/algorithm" class="mobile-item">Ranking Algorithm</a>
+        <a href="/data_management" class="mobile-item">Data Management</a>
+        <a href="/about" class="mobile-item">About</a>
+        <a href="/settings" class="mobile-item">Settings</a>
+        {% if current_user %}
+          <a href="/logout" class="mobile-item" style="color: var(--accent-red);">Logout ({{ current_user.username }})</a>
+        {% else %}
+          <a href="/login" class="mobile-item" style="color: var(--accent-cyan);">Login</a>
+        {% endif %}
+      </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="page-content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- ==========================================================================
+         TECHNOLOGIES USED SECTION (Can be overridden or omitted per page)
+         ========================================================================== -->
+    {% block tech_used %}
+    <section class="tech-used-section">
+      <div class="tech-used-container">
+        <div class="tech-header-bar">
+          <i data-lucide="cpu"></i> TECHNOLOGIES USED
+        </div>
+        <div class="tech-badges-grid">
+          
+          <div class="tech-badge-card">
+            <div class="tech-badge-name">HTML5</div>
+            <div class="tech-badge-desc">“Used to structure the web application.”</div>
+          </div>
+
+          <div class="tech-badge-card">
+            <div class="tech-badge-name">CSS3</div>
+            <div class="tech-badge-desc">“Used to create the layout, styling, animations, and visual design.”</div>
+          </div>
+
+          <div class="tech-badge-card">
+            <div class="tech-badge-name">JavaScript</div>
+            <div class="tech-badge-desc">“Used for interactive UI elements, filters, comparisons, and dynamic updates.”</div>
+          </div>
+
+          <div class="tech-badge-card">
+            <div class="tech-badge-name">Python</div>
+            <div class="tech-badge-desc">“Used for data processing, calculations, and ranking logic.”</div>
+          </div>
+
+          <div class="tech-badge-card">
+            <div class="tech-badge-name">Flask & Auth</div>
+            <div class="tech-badge-desc">“Used for web routing, user authentication, session security, and access control.”</div>
+          </div>
+
+          <div class="tech-badge-card">
+            <div class="tech-badge-name">Pandas</div>
+            <div class="tech-badge-desc">“Used to process, analyze, filter, and manipulate player data.”</div>
+          </div>
+
+          <div class="tech-badge-card">
+            <div class="tech-badge-name">Chart.js</div>
+            <div class="tech-badge-desc">“Used to create interactive performance and analytics charts.”</div>
+          </div>
+
+          <div class="tech-badge-card">
+            <div class="tech-badge-name">CSV & JSON</div>
+            <div class="tech-badge-desc">“Used for player dataset storage, user credentials, and data import/export.”</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    {% endblock %}
+
+    <!-- Global Application Footer -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          🏆 PLAYER PERFORMANCE RANKING DASHBOARD
+          <span class="footer-tagline">“Analyze • Compare • Rank • Perform”</span>
+        </div>
+        <div class="footer-links">
+          <a href="/">Home</a>
+          <a href="/dashboard">Dashboard</a>
+          <a href="/rankings">Rankings</a>
+          <a href="/comparison">Compare</a>
+          <a href="/analytics">Analytics</a>
+          <a href="/algorithm">Algorithm</a>
+          <a href="/data_management">Data</a>
+          <a href="/login">Login</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/background3d.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

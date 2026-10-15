@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="data-management-page">
+
+  <!-- Header & Actions -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">
+          📁 DATASET MANAGEMENT & CSV VALIDATION
+        </h2>
+        <p style="font-size: 0.88rem; color: var(--text-secondary);">
+          Manage player records, validate custom CSV uploads, check data integrity, or export rankings.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.85rem; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="openAddPlayerModal()">
+          <i data-lucide="user-plus"></i> Add Player
+        </button>
+        <button class="btn btn-secondary" onclick="openCSVModal()">
+          <i data-lucide="upload-cloud"></i> Upload CSV
+        </button>
+        <a href="/api/data/export_csv" class="btn btn-outline" download>
+          <i data-lucide="download"></i> Export CSV
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset Summary Cards -->
+  <div class="kpi-grid" style="margin-bottom: 2rem;">
+    <div class="kpi-card blue">
+      <div class="kpi-header"><span class="kpi-label">Total Records</span></div>
+      <div class="kpi-value" id="dm-total-records">0</div>
+      <div class="kpi-subtext">Total dataset rows</div>
+    </div>
+
+    <div class="kpi-card green">
+      <div class="kpi-header"><span class="kpi-label">Valid Records</span></div>
+      <div class="kpi-value" id="dm-valid-records">0</div>
+      <div class="kpi-subtext">Passed schema validation</div>
+    </div>
+
+    <div class="kpi-card gold">
+      <div class="kpi-header"><span class="kpi-label">Invalid Records</span></div>
+      <div class="kpi-value" id="dm-invalid-records">0</div>
+      <div class="kpi-subtext">Out-of-bounds or missing</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Duplicate Records</span></div>
+      <div class="kpi-value" id="dm-duplicate-records">0</div>
+      <div class="kpi-subtext">Duplicate Player IDs</div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <div class="card-title" style="padding: 1.25rem 1.5rem; margin: 0; border-bottom: 1px solid var(--border-color);">
+      <span><i data-lucide="database"></i> Registered Player Dataset</span>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Player ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Matches</th>
+            <th>Goals</th>
+            <th>Assists</th>
+            <th>Passing</th>
+            <th>Defense</th>
+            <th>Fitness</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="dm-players-tbody">
+          <tr><td colspan="12" style="text-align: center; padding: 2rem;">Loading player records...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add/Edit Player Modal -->
+  <div class="modal-overlay" id="player-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title" style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700;">Add New Player</h3>
+        <button class="btn btn-outline btn-sm" onclick="closePlayerModal()"><i data-lucide="x"></i></button>
+      </div>
+      <form id="player-form">
+        <div class="modal-body">
+          <input type="hidden" id="edit-mode" value="add">
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="form-id">Player ID *</label>
+              <input type="text" id="form-id" class="form-control" placeholder="PL021" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-name">Player Name *</label>
+              <input type="text" id="form-name" class="form-control" placeholder="John Smith" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="form-age">Age (15-60) *</label>
+              <input type="number" id="form-age" class="form-control" min="15" max="60" value="24" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-team">Team *</label>
+              <select id="form-team" class="form-control" required>
+                <option value="Apex Strikers">Apex Strikers</option>
+                <option value="Nova Knights">Nova Knights</option>
+                <option value="Titan Warriors">Titan Warriors</option>
+                <option value="Shadow Strikers">Shadow Strikers</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-pos">Position *</label>
+              <select id="form-pos" class="form-control" required>
+                <option value="Forward">Forward</option>
+                <option value="Midfielder">Midfielder</option>
+                <option value="Defender">Defender</option>
+                <option value="Goalkeeper">Goalkeeper</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="form-matches">Matches *</label>
+              <input type="number" id="form-matches" class="form-control" min="0" value="15" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-goals">Goals *</label>
+              <input type="number" id="form-goals" class="form-control" min="0" value="10" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-assists">Assists *</label>
+              <input type="number" id="form-assists" class="form-control" min="0" value="5" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="form-passing">Passing (%) *</label>
+              <input type="number" id="form-passing" class="form-control" min="0" max="100" value="85" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-defense">Defense (0-100) *</label>
+              <input type="number" id="form-defense" class="form-control" min="0" max="100" value="65" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="form-fitness">Fitness (0-100) *</label>
+              <input type="number" id="form-fitness" class="form-control" min="0" max="100" value="90" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closePlayerModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Player</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CSV Upload Modal -->
+  <div class="modal-overlay" id="csv-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700;">Upload & Validate CSV Dataset</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeCSVModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Select a <code>.csv</code> dataset. Columns must include: <br>
+          <code style="color: var(--accent-cyan);">Player ID, Player Name, Age, Team, Position, Matches, Goals, Assists, Passing, Defense, Fitness</code>
+        </p>
+
+        <div style="border: 2px dashed var(--border-color); border-radius: var(--radius-md); padding: 2rem; text-align: center; background: #0f172a;">
+          <input type="file" id="csv-file-input" accept=".csv">
+        </div>
+
+        <div id="csv-report" style="margin-top: 1rem; display: none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCSVModal()">Close</button>
+        <button class="btn btn-primary" onclick="submitCSVImport()">Validate & Import</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let dmPlayers = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchDMPlayers();
+  document.getElementById('player-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    savePlayerForm();
+  });
+});
+
+function fetchDMPlayers() {
+  fetch('/api/players')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.players) {
+        dmPlayers = data.players;
+        renderTable(dmPlayers);
+        
+        document.getElementById('dm-total-records').textContent = data.players.length;
+        document.getElementById('dm-valid-records').textContent = data.players.length;
+        document.getElementById('dm-invalid-records').textContent = '0';
+        document.getElementById('dm-duplicate-records').textContent = '0';
+      }
+    });
+}
+
+function renderTable(players) {
+  const tbody = document.getElementById('dm-players-tbody');
+  tbody.innerHTML = players.map(p => `
+    <tr>
+      <td><strong>${p['Player ID']}</strong></td>
+      <td><strong>${p['Player Name']}</strong></td>
+      <td>${p.Age}</td>
+      <td>${p.Team}</td>
+      <td>${p.Position}</td>
+      <td>${p.Matches}</td>
+      <td>${p.Goals}</td>
+      <td>${p.Assists}</td>
+      <td>${p.Passing}%</td>
+      <td>${p.Defense}</td>
+      <td>${p.Fitness}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editPlayer('${p['Player ID']}')"><i data-lucide="edit-2"></i></button>
+        <button class="btn btn-outline btn-sm" onclick="deletePlayer('${p['Player ID']}')" style="color: var(--accent-red);"><i data-lucide="trash-2"></i></button>
+      </td>
+    </tr>
+  `).join('');
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function openAddPlayerModal() {
+  document.getElementById('edit-mode').value = 'add';
+  document.getElementById('modal-title').textContent = 'Add New Player';
+  document.getElementById('form-id').readOnly = false;
+  document.getElementById('player-form').reset();
+  document.getElementById('player-modal').classList.add('active');
+}
+
+function closePlayerModal() {
+  document.getElementById('player-modal').classList.remove('active');
+}
+
+function editPlayer(pid) {
+  const p = dmPlayers.find(item => item['Player ID'] === pid);
+  if (!p) return;
+
+  document.getElementById('edit-mode').value = 'edit';
+  document.getElementById('modal-title').textContent = `Edit Player - ${p['Player Name']}`;
+  document.getElementById('form-id').value = p['Player ID'];
+  document.getElementById('form-id').readOnly = true;
+  document.getElementById('form-name').value = p['Player Name'];
+  document.getElementById('form-age').value = p.Age;
+  document.getElementById('form-team').value = p.Team;
+  document.getElementById('form-pos').value = p.Position;
+  document.getElementById('form-matches').value = p.Matches;
+  document.getElementById('form-goals').value = p.Goals;
+  document.getElementById('form-assists').value = p.Assists;
+  document.getElementById('form-passing').value = p.Passing;
+  document.getElementById('form-defense').value = p.Defense;
+  document.getElementById('form-fitness').value = p.Fitness;
+
+  document.getElementById('player-modal').classList.add('active');
+}
+
+function savePlayerForm() {
+  const mode = document.getElementById('edit-mode').value;
+  const pid = document.getElementById('form-id').value;
+
+  const payload = {
+    'Player ID': pid,
+    'Player Name': document.getElementById('form-name').value,
+    'Age': document.getElementById('form-age').value,
+    'Team': document.getElementById('form-team').value,
+    'Position': document.getElementById('form-pos').value,
+    'Matches': document.getElementById('form-matches').value,
+    'Goals': document.getElementById('form-goals').value,
+    'Assists': document.getElementById('form-assists').value,
+    'Passing': document.getElementById('form-passing').value,
+    'Defense': document.getElementById('form-defense').value,
+    'Fitness': document.getElementById('form-fitness').value
+  };
+
+  const url = mode === 'add' ? '/api/players/add' : `/api/players/edit/${pid}`;
+  const method = mode === 'add' ? 'POST' : 'PUT';
+
+  fetch(url, {
+    method: method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      showToast(data.message);
+      closePlayerModal();
+      fetchDMPlayers();
+    } else {
+      showToast(data.message || "Validation Error", 'error');
+    }
+  });
+}
+
+function deletePlayer(pid) {
+  if (!confirm(`Delete player ${pid}?`)) return;
+  fetch(`/api/players/delete/${pid}`, { method: 'DELETE' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast(data.message);
+        fetchDMPlayers();
+      }
+    });
+}
+
+function openCSVModal() {
+  document.getElementById('csv-modal').classList.add('active');
+  document.getElementById('csv-report').style.display = 'none';
+}
+
+function closeCSVModal() {
+  document.getElementById('csv-modal').classList.remove('active');
+}
+
+function submitCSVImport() {
+  const input = document.getElementById('csv-file-input');
+  if (!input.files || input.files.length === 0) {
+    showToast("Please select a CSV file.", "error");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', input.files[0]);
+
+  fetch('/api/data/import_csv', { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+      const report = document.getElementById('csv-report');
+      report.style.display = 'block';
+      if (data.success) {
+        report.innerHTML = `<div class="badge badge-very-good" style="display: block; padding: 0.75rem;">✓ ${data.message}</div>`;
+        showToast(data.message);
+        setTimeout(() => { closeCSVModal(); fetchDMPlayers(); }, 1000);
+      } else {
+        const errs = data.errors ? data.errors.map(e => `<li>${e}</li>`).join('') : '';
+        report.innerHTML = `<div style="color: var(--accent-red); padding: 0.75rem; background: rgba(239, 68, 68, 0.15); border-radius: 6px;"><strong>CSV Errors:</strong><ul>${errs}</ul></div>`;
+      }
+    });
+}
+</script>
+{% endblock %}

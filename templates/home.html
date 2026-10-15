@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="home-container" style="text-align: center; padding: 2.5rem 1rem 3rem 1rem; max-width: 950px; margin: 0 auto;">
+
+  <!-- Hero Section -->
+  <div style="margin-bottom: 3.5rem;">
+    <span class="badge badge-very-good" style="font-size: 0.85rem; padding: 0.4rem 1rem; margin-bottom: 1.5rem; display: inline-block;">
+      ⚡ Real Sports Analytics Engine
+    </span>
+
+    <h1 style="font-family: var(--font-heading); font-size: 2.8rem; font-weight: 800; line-height: 1.25; margin-bottom: 1rem; color: var(--text-primary);">
+      PLAYER PERFORMANCE <br>
+      <span style="color: var(--accent-cyan);">RANKING DASHBOARD</span>
+    </h1>
+
+    <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 750px; margin: 0 auto 2rem auto; line-height: 1.6;">
+      Analyze player statistics, calculate performance scores, compare players, and discover top performers.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="/rankings" class="btn btn-primary" style="padding: 0.75rem 1.75rem; font-size: 1rem;">
+        <i data-lucide="trophy"></i> Explore Rankings
+      </a>
+      <a href="/dashboard" class="btn btn-secondary" style="padding: 0.75rem 1.75rem; font-size: 1rem;">
+        <i data-lucide="layout-dashboard"></i> View Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- 4 Important Statistics Cards (Dynamically Calculated) -->
+  <div class="kpi-grid" style="margin-bottom: 3.5rem;">
+    <div class="kpi-card blue">
+      <div class="kpi-header"><span class="kpi-label">Total Players</span></div>
+      <div class="kpi-value" id="home-total-players">—</div>
+      <div class="kpi-subtext">Active dataset records</div>
+    </div>
+
+    <div class="kpi-card green">
+      <div class="kpi-header"><span class="kpi-label">Average Score</span></div>
+      <div class="kpi-value" id="home-avg-score">—</div>
+      <div class="kpi-subtext">Mean performance rating</div>
+    </div>
+
+    <div class="kpi-card gold">
+      <div class="kpi-header"><span class="kpi-label">Top Player</span></div>
+      <div class="kpi-value" id="home-top-player" style="font-size: 1.35rem;">—</div>
+      <div class="kpi-subtext">Rank #1 Leader</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Total Teams</span></div>
+      <div class="kpi-value" id="home-total-teams">—</div>
+      <div class="kpi-subtext">Competing sports teams</div>
+    </div>
+  </div>
+
+  <!-- Top Performers Section (Podium) -->
+  <div style="margin-bottom: 3.5rem;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; text-align: center;">
+      🏆 Top Performers
+    </h2>
+
+    <div class="podium-container">
+      <div class="podium-card rank-2">
+        <div class="podium-badge">🥈</div>
+        <div class="podium-name" id="home-podium-2-name">Rank 2</div>
+        <div class="podium-team" id="home-podium-2-team">—</div>
+        <div class="podium-score" id="home-podium-2-score">— pts</div>
+      </div>
+
+      <div class="podium-card rank-1">
+        <div class="podium-badge">🥇</div>
+        <div class="podium-name" id="home-podium-1-name">Rank 1</div>
+        <div class="podium-team" id="home-podium-1-team">—</div>
+        <div class="podium-score" id="home-podium-1-score" style="color: var(--accent-gold); font-size: 1.6rem;">— pts</div>
+      </div>
+
+      <div class="podium-card rank-3">
+        <div class="podium-badge">🥉</div>
+        <div class="podium-name" id="home-podium-3-name">Rank 3</div>
+        <div class="podium-team" id="home-podium-3-team">—</div>
+        <div class="podium-score" id="home-podium-3-score">— pts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works Flowchart -->
+  <div class="card" style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); padding: 2rem;">
+    <h3 class="card-title" style="justify-content: center; margin-bottom: 1.5rem;">
+      <i data-lucide="git-branch"></i> System Workflow: How It Works
+    </h3>
+
+    <div style="display: flex; align-items: center; justify-content: space-around; flex-wrap: wrap; gap: 1rem;">
+      <div style="text-align: center;">
+        <div style="width: 45px; height: 45px; background: rgba(6, 182, 212, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.5rem auto; color: var(--accent-cyan); font-weight: 700;">1</div>
+        <strong style="display: block; font-size: 0.9rem;">Player Data</strong>
+      </div>
+      <div style="color: var(--text-muted); font-weight: 700;">↓</div>
+
+      <div style="text-align: center;">
+        <div style="width: 45px; height: 45px; background: rgba(59, 130, 246, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.5rem auto; color: var(--accent-blue); font-weight: 700;">2</div>
+        <strong style="display: block; font-size: 0.9rem;">Data Processing</strong>
+      </div>
+      <div style="color: var(--text-muted); font-weight: 700;">↓</div>
+
+      <div style="text-align: center;">
+        <div style="width: 45px; height: 45px; background: rgba(245, 158, 11, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.5rem auto; color: var(--accent-gold); font-weight: 700;">3</div>
+        <strong style="display: block; font-size: 0.9rem;">Performance Metrics</strong>
+      </div>
+      <div style="color: var(--text-muted); font-weight: 700;">↓</div>
+
+      <div style="text-align: center;">
+        <div style="width: 45px; height: 45px; background: rgba(16, 185, 129, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.5rem auto; color: var(--accent-green); font-weight: 700;">4</div>
+        <strong style="display: block; font-size: 0.9rem;">Ranking Algorithm</strong>
+      </div>
+      <div style="color: var(--text-muted); font-weight: 700;">↓</div>
+
+      <div style="text-align: center;">
+        <div style="width: 45px; height: 45px; background: rgba(236, 72, 153, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.5rem auto; color: #ec4899; font-weight: 700;">5</div>
+        <strong style="display: block; font-size: 0.9rem;">Performance Score</strong>
+      </div>
+      <div style="color: var(--text-muted); font-weight: 700;">↓</div>
+
+      <div style="text-align: center;">
+        <div style="width: 45px; height: 45px; background: rgba(139, 92, 246, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.5rem auto; color: #8b5cf6; font-weight: 700;">6</div>
+        <strong style="display: block; font-size: 0.9rem;">Final Ranking</strong>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('/api/players')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.summary) {
+        document.getElementById('home-total-players').textContent = data.summary.total_players;
+        document.getElementById('home-avg-score').textContent = data.summary.avg_score;
+        document.getElementById('home-top-player').textContent = data.summary.top_player;
+        document.getElementById('home-total-teams').textContent = data.summary.total_teams;
+        
+        if (data.players && data.players.length >= 3) {
+          const p1 = data.players[0];
+          const p2 = data.players[1];
+          const p3 = data.players[2];
+
+          document.getElementById('home-podium-1-name').textContent = p1['Player Name'];
+          document.getElementById('home-podium-1-team').textContent = `${p1['Team']} • ${p1['Position']}`;
+          document.getElementById('home-podium-1-score').textContent = `${p1['Performance Score']} pts`;
+
+          document.getElementById('home-podium-2-name').textContent = p2['Player Name'];
+          document.getElementById('home-podium-2-team').textContent = `${p2['Team']} • ${p2['Position']}`;
+          document.getElementById('home-podium-2-score').textContent = `${p2['Performance Score']} pts`;
+
+          document.getElementById('home-podium-3-name').textContent = p3['Player Name'];
+          document.getElementById('home-podium-3-team').textContent = `${p3['Team']} • ${p3['Position']}`;
+          document.getElementById('home-podium-3-score').textContent = `${p3['Performance Score']} pts`;
+        }
+      }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="comparison-page">
+
+  <!-- Select Players Bar (Supports 2 or 3 Players) -->
+  <div class="card" style="margin-bottom: 2rem; background: linear-gradient(145deg, #1e293b, #0f172a);">
+    <div style="display: flex; align-items: center; justify-content: space-around; flex-wrap: wrap; gap: 1rem;">
+      
+      <div style="flex: 1; min-width: 220px;">
+        <label for="select-p1" class="form-label" style="color: var(--accent-cyan); font-weight: 700;">
+          <i data-lucide="user"></i> Select Player 1:
+        </label>
+        <select id="select-p1" class="form-control" style="font-weight: 600;"></select>
+      </div>
+
+      <div style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-muted); padding-top: 1.5rem;">
+        VS
+      </div>
+
+      <div style="flex: 1; min-width: 220px;">
+        <label for="select-p2" class="form-label" style="color: var(--accent-gold); font-weight: 700;">
+          <i data-lucide="user"></i> Select Player 2:
+        </label>
+        <select id="select-p2" class="form-control" style="font-weight: 600;"></select>
+      </div>
+
+      <div style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-muted); padding-top: 1.5rem;">
+        VS
+      </div>
+
+      <div style="flex: 1; min-width: 220px;">
+        <label for="select-p3" class="form-label" style="color: var(--accent-green); font-weight: 700;">
+          <i data-lucide="user"></i> Select Player 3 (Optional):
+        </label>
+        <select id="select-p3" class="form-control" style="font-weight: 600;">
+          <option value="none">-- None --</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Comparison Metrics Table -->
+  <div class="card" style="margin-bottom: 2rem; padding: 0; overflow: hidden;">
+    <div class="card-title" style="padding: 1.25rem 1.5rem; margin: 0; border-bottom: 1px solid var(--border-color); text-align: center;">
+      <i data-lucide="git-compare"></i> Side-by-Side Performance Comparison
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr id="comp-table-headers">
+            <th style="text-align: center;">Metric</th>
+            <th style="text-align: center;" id="th-p1">Player 1</th>
+            <th style="text-align: center;" id="th-p2">Player 2</th>
+            <th style="text-align: center;" id="th-p3">Player 3</th>
+          </tr>
+        </thead>
+        <tbody id="comp-table-body">
+          <tr><td colspan="4" style="text-align: center; padding: 2rem;">Select players above to view comparative analytics.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid">
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="bar-chart-2"></i> Comparative Metrics Bar Chart</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="comp-chart-bar"></canvas>
+      </div>
+    </div>
+
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="radar"></i> Performance Radar Comparison</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="comp-chart-radar"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+{% endblock %}

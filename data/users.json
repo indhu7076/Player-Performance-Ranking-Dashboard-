@@ -1,0 +1,16 @@
+[
+  {
+    "username": "admin",
+    "email": "admin@sportsanalytics.com",
+    "password_hash": "scrypt:32768:8:1$kXp157pG4jVz0R0L$04fa2bb609aa523ef382ec29b82bf49b06f851ae1dcd2c4c1a533bf6a8dfa3ae334586dcf3ae67ed774136e651e28faee78401340b080fb48c8cece675c97ef4",
+    "role": "Admin",
+    "created_at": "2026-09-30T00:00:00Z"
+  },
+  {
+    "username": "analyst",
+    "email": "analyst@sportsanalytics.com",
+    "password_hash": "scrypt:32768:8:1$kXp157pG4jVz0R0L$04fa2bb609aa523ef382ec29b82bf49b06f851ae1dcd2c4c1a533bf6a8dfa3ae334586dcf3ae67ed774136e651e28faee78401340b080fb48c8cece675c97ef4",
+    "role": "Analyst",
+    "created_at": "2026-09-30T00:00:00Z"
+  }
+]

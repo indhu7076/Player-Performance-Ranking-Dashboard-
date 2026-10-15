@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="settings-page" style="max-width: 800px; margin: 0 auto;">
+
+  <!-- Header -->
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; margin-bottom: 0.3rem;">
+      ⚙️ SYSTEM SETTINGS
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+      Manage application theme, WebGL animations, accessibility, and dataset settings.
+    </p>
+  </div>
+
+  <!-- Appearance Card -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h3 class="card-title"><i data-lucide="palette"></i> Appearance</h3>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);">
+      <div>
+        <strong>Theme Selection</strong>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Switch between Dark Navy theme and Light mode.</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="setting-theme-btn" onclick="toggleAppTheme()">
+        Switch Theme Mode
+      </button>
+    </div>
+  </div>
+
+  <!-- Animations & Accessibility Card -->
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h3 class="card-title"><i data-lucide="eye"></i> Animations & Accessibility</h3>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);">
+      <div>
+        <strong>3D Background Animation</strong>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Enable or disable ambient WebGL particle background canvas.</div>
+      </div>
+      <div>
+        <input type="checkbox" id="setting-3d-toggle" checked style="width: 18px; height: 18px;">
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0;">
+      <div>
+        <strong>Reduced Motion Accessibility</strong>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Disable UI motion transitions and canvas background rotation.</div>
+      </div>
+      <div>
+        <input type="checkbox" id="setting-reduced-motion" style="width: 18px; height: 18px;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Maintenance Card -->
+  <div class="card" style="border-top: 3px solid var(--accent-red);">
+    <h3 class="card-title" style="color: var(--accent-red);"><i data-lucide="rotate-ccw"></i> Data Maintenance</h3>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0;">
+      <div>
+        <strong>Reset Sample Dataset</strong>
+        <div style="font-size: 0.82rem; color: var(--text-secondary);">Restores original sample dataset and 30-20-20-15-15 default weights.</div>
+      </div>
+      <button class="btn btn-accent" onclick="triggerDemoReset()">
+        Reset Dataset
+      </button>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleAppTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  showToast(`Switched to ${next} theme`);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle3d = document.getElementById('setting-3d-toggle');
+  const reduced = document.getElementById('setting-reduced-motion');
+
+  if (toggle3d) {
+    toggle3d.checked = localStorage.getItem('bg_anim_enabled') !== 'false';
+    toggle3d.addEventListener('change', () => {
+      const enable = toggle3d.checked;
+      localStorage.setItem('bg_anim_enabled', enable);
+      if (window.toggle3DAnimation) window.toggle3DAnimation(enable);
+      showToast(enable ? "3D background enabled" : "3D background disabled");
+    });
+  }
+
+  if (reduced) {
+    reduced.addEventListener('change', () => {
+      if (reduced.checked) {
+        if (toggle3d) toggle3d.checked = false;
+        localStorage.setItem('bg_anim_enabled', false);
+        if (window.toggle3DAnimation) window.toggle3DAnimation(false);
+        showToast("Reduced motion activated");
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="analytics-page">
+
+  <!-- Header -->
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">
+      📊 ANALYTICS & DATA INSIGHTS
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+      Statistical insights and metric correlation analysis synthesized from current dataset values.
+    </p>
+  </div>
+
+  <!-- Key Insights Section -->
+  <div class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--accent-cyan);">
+    <div class="card-title">
+      <span><i data-lucide="sparkles"></i> Automated Key Dataset Insights</span>
+      <span class="badge badge-very-good">Calculated from Dataset</span>
+    </div>
+    <div id="analytics-key-insights" style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.95rem;">
+      Loading key dataset insights...
+    </div>
+  </div>
+
+  <!-- Analytical Breakdowns Grid -->
+  <div class="charts-grid" style="margin-bottom: 2rem;">
+    
+    <!-- 1. Age vs Performance -->
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="user-check"></i> Age vs Performance Correlation</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-age-perf"></canvas>
+      </div>
+    </div>
+
+    <!-- 2. Goals vs Performance -->
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="target"></i> Goals vs Performance Score</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-goals-perf"></canvas>
+      </div>
+    </div>
+
+    <!-- 3. Assists vs Performance -->
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="share-2"></i> Assists vs Performance Score</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-assists-perf"></canvas>
+      </div>
+    </div>
+
+    <!-- 4. Team & Position Performance Summary -->
+    <div class="card col-6">
+      <div class="card-title">
+        <span><i data-lucide="building"></i> Team Average Performance Benchmarks</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart-team-benchmarks"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  fetch('/api/players')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.players) {
+        renderAnalyticsPage(data.players);
+      }
+    });
+});
+
+function renderAnalyticsPage(players) {
+  if (!players || players.length === 0) return;
+
+  // Key Insights
+  const topPlayer = [...players].sort((a,b) => b['Performance Score'] - a['Performance Score'])[0];
+  
+  const teams = {};
+  players.forEach(p => {
+    if (!teams[p.Team]) teams[p.Team] = { total: 0, count: 0 };
+    teams[p.Team].total += p['Performance Score'];
+    teams[p.Team].count += 1;
+  });
+
+  let topTeam = 'N/A';
+  let topTeamAvg = -1;
+  Object.keys(teams).forEach(t => {
+    const avg = teams[t].total / teams[t].count;
+    if (avg > topTeamAvg) {
+      topTeamAvg = avg;
+      topTeam = t;
+    }
+  });
+
+  const insightsContainer = document.getElementById('analytics-key-insights');
+  insightsContainer.innerHTML = `
+    <div style="display: flex; gap: 0.6rem; align-items: center;">
+      <i data-lucide="check-circle-2" style="color: var(--accent-cyan); width: 18px;"></i>
+      <span><strong>${topTeam}</strong> currently has the highest average performance score of <strong>${topTeamAvg.toFixed(1)} pts</strong> across competing teams.</span>
+    </div>
+    <div style="display: flex; gap: 0.6rem; align-items: center;">
+      <i data-lucide="check-circle-2" style="color: var(--accent-gold); width: 18px;"></i>
+      <span><strong>${topPlayer['Player Name']}</strong> (${topPlayer['Team']}) holds the highest overall individual score of <strong>${topPlayer['Performance Score']} pts</strong> with a performance level of <strong>${topPlayer['Performance Level']}</strong>.</span>
+    </div>
+    <div style="display: flex; gap: 0.6rem; align-items: center;">
+      <i data-lucide="check-circle-2" style="color: var(--accent-green); width: 18px;"></i>
+      <span>The average performance score across all <strong>${players.length} dataset players</strong> is <strong>${(players.reduce((sum, p) => sum + p['Performance Score'], 0)/players.length).toFixed(1)} pts</strong>.</span>
+    </div>
+  `;
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+
+  // Charts
+  if (typeof Chart === 'undefined') return;
+
+  // Age vs Perf Scatter/Bubble
+  const ctxAge = document.getElementById('chart-age-perf');
+  if (ctxAge) {
+    new Chart(ctxAge, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Player Age vs Score',
+          data: players.map(p => ({ x: p.Age, y: p['Performance Score'] })),
+          backgroundColor: '#06b6d4'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: 'Age (Years)', color: '#94a3b8' }, ticks: { color: '#64748b' }, grid: { color: '#334155' } },
+          y: { title: { display: true, text: 'Performance Score', color: '#94a3b8' }, ticks: { color: '#64748b' }, grid: { color: '#334155' } }
+        },
+        plugins: { legend: { labels: { color: '#94a3b8' } } }
+      }
+    });
+  }
+
+  // Goals vs Perf
+  const ctxGoals = document.getElementById('chart-goals-perf');
+  if (ctxGoals) {
+    new Chart(ctxGoals, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Goals vs Score',
+          data: players.map(p => ({ x: p.Goals, y: p['Performance Score'] })),
+          backgroundColor: '#f59e0b'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: 'Goals', color: '#94a3b8' }, ticks: { color: '#64748b' }, grid: { color: '#334155' } },
+          y: { title: { display: true, text: 'Performance Score', color: '#94a3b8' }, ticks: { color: '#64748b' }, grid: { color: '#334155' } }
+        },
+        plugins: { legend: { labels: { color: '#94a3b8' } } }
+      }
+    });
+  }
+
+  // Assists vs Perf
+  const ctxAssists = document.getElementById('chart-assists-perf');
+  if (ctxAssists) {
+    new Chart(ctxAssists, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Assists vs Score',
+          data: players.map(p => ({ x: p.Assists, y: p['Performance Score'] })),
+          backgroundColor: '#3b82f6'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { title: { display: true, text: 'Assists', color: '#94a3b8' }, ticks: { color: '#64748b' }, grid: { color: '#334155' } },
+          y: { title: { display: true, text: 'Performance Score', color: '#94a3b8' }, ticks: { color: '#64748b' }, grid: { color: '#334155' } }
+        },
+        plugins: { legend: { labels: { color: '#94a3b8' } } }
+      }
+    });
+  }
+
+  // Team Benchmarks Bar
+  const ctxTeam = document.getElementById('chart-team-benchmarks');
+  if (ctxTeam) {
+    const teamNames = Object.keys(teams);
+    const teamAvgs = teamNames.map(t => (teams[t].total / teams[t].count).toFixed(1));
+
+    new Chart(ctxTeam, {
+      type: 'bar',
+      data: {
+        labels: teamNames,
+        datasets: [{
+          label: 'Team Benchmark Average',
+          data: teamAvgs,
+          backgroundColor: '#10b981',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { color: '#64748b' }, grid: { color: '#334155' } },
+          y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } }
+        },
+        plugins: { legend: { labels: { color: '#94a3b8' } } }
+      }
+    });
+  }
+}
+</script>
+{% endblock %}

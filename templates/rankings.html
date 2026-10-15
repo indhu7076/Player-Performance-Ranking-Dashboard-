@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="rankings-page">
+
+  <!-- Header & Top 3 Podium Section -->
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; text-align: center;">
+      🏆 PLAYER RANKINGS
+    </h1>
+
+    <div class="podium-container">
+      <div class="podium-card rank-2">
+        <div class="podium-badge">🥈</div>
+        <div class="podium-name" id="podium-2-name">Rank 2</div>
+        <div class="podium-team" id="podium-2-team">—</div>
+        <div class="podium-score" id="podium-2-score">— pts</div>
+      </div>
+
+      <div class="podium-card rank-1">
+        <div class="podium-badge">🥇</div>
+        <div class="podium-name" id="podium-1-name">Rank 1</div>
+        <div class="podium-team" id="podium-1-team">—</div>
+        <div class="podium-score" id="podium-1-score" style="color: var(--accent-gold); font-size: 1.6rem;">— pts</div>
+      </div>
+
+      <div class="podium-card rank-3">
+        <div class="podium-badge">🥉</div>
+        <div class="podium-name" id="podium-3-name">Rank 3</div>
+        <div class="podium-team" id="podium-3-team">—</div>
+        <div class="podium-score" id="podium-3-score">— pts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+      
+      <div style="position: relative; flex: 1; min-width: 250px;">
+        <input type="text" id="rank-search" class="form-control" placeholder="Search player name, team, or ID..." style="padding-left: 2.3rem;">
+        <i data-lucide="search" style="position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px;"></i>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <select id="rank-team-filter" class="form-control" style="width: 160px;">
+          <option value="all">All Teams</option>
+          <option value="Apex Strikers">Apex Strikers</option>
+          <option value="Nova Knights">Nova Knights</option>
+          <option value="Titan Warriors">Titan Warriors</option>
+          <option value="Shadow Strikers">Shadow Strikers</option>
+        </select>
+
+        <select id="rank-pos-filter" class="form-control" style="width: 160px;">
+          <option value="all">All Positions</option>
+          <option value="Forward">Forward</option>
+          <option value="Midfielder">Midfielder</option>
+          <option value="Defender">Defender</option>
+          <option value="Goalkeeper">Goalkeeper</option>
+        </select>
+
+        <select id="rank-sort-select" class="form-control" style="width: 170px;">
+          <option value="Rank-asc">Sort by Rank (Asc)</option>
+          <option value="Score-desc">Sort by Score (Desc)</option>
+          <option value="Name-asc">Sort by Name (A-Z)</option>
+          <option value="Goals-desc">Sort by Goals (Desc)</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Dynamic Rankings Table -->
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Team</th>
+            <th>Position</th>
+            <th>Performance Score</th>
+            <th>Performance Level</th>
+          </tr>
+        </thead>
+        <tbody id="rankings-tbody">
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 2rem;">Loading player rankings...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/rankings.js') }}"></script>
+{% endblock %}
